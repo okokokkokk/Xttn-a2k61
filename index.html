@@ -139,23 +139,6 @@
       ✅ Từ 50 điểm trở lên: ĐỖ
       ❌ Dưới 50 điểm: KHÔNG ĐỖ`);
     }
-    const name = document.getElementById('hoten').value;
-    const loptruong = document.getElementById('loptruong').value;
-    const status = tong >= 50 ? "ĐỖ" : "KHÔNG ĐỖ";
-
-    // Gửi dữ liệu lên Google Sheets
-    fetch("LINK_API_CUA_BAN", {
-      method: "POST",
-      body: JSON.stringify({
-        name: name,
-        class: loptruong,
-        score: tong.toFixed(1),
-        status: status
-      }),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
 
   </script>
 </body>
