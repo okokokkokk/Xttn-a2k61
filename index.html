@@ -11,6 +11,9 @@
     <div>
         <h2 class="tieude">Form xét tuyển tài năng vào lớp A2K61</h2>
     </div>
+    <label>Họ tên <input type="text" id="hoten"></label>
+    <label>Lớp <input type="text" id="loptruong"></label>
+
 
     <label>Điểm tb cả năm môn Toán <input type="number" id="toan" step="0.1" min="0" max="10"></label>
     <label>Điểm tb cả năm môn Lý <input type="number" id="ly" step="0.1" min="0" max="10"></label>
@@ -22,14 +25,14 @@
     <label>Số giải Nhất (kì thi hsg) <input type="number" id="nhat" min="0"></label>
 
     <label>IELTS (nếu có)<input type="number" id="ielts" step="0.5" min="0" max="9"></label>
-    <label>Học sinh lớp nào:
+    <label>Học sinh lớp chọn không?:
       <select id="lop">
         <option value="">-- Chọn lớp --</option>
         <option value="A1K61">A1K61</option>
         <option value="A5K61">A5K61</option>
         <option value="D1K61">D1K61</option>
         <option value="D2K61">D2K61</option>
-        <option value="Khác">Khác</option>
+        <option value="Khác">Không</option>
       </select>
     </label>
     
@@ -55,24 +58,22 @@
       const pv = +document.getElementById('pv').value;
       const lop = document.getElementById('lop').value;
 
+      const name = document.getElementById('hoten').value;
+      const loptruong = document.getElementById('loptruong').value;
+
       const tb = (toan + ly + anh) / 3;
       const diemHocBa = tb * 4;
-
       const diemThanhTich = Math.min(30, kk * 5 + ba * 10 + nhi * 15 + nhat * 20);
 
-      // Tính điểm IELTS
       let diemIELTS = 0;
       if (ielts >= 5 && ielts <= 9) {
         diemIELTS = Math.floor((ielts - 5) * 2) + 1;
       }
 
-      // Tính điểm cộng từ lớp
       let diemLop = 0;
       if (lop === "A1K61" || lop === "D1K61") diemLop = 5;
       else if (lop === "A5K61" || lop === "D2K61") diemLop = 4;
-      else if (lop === "Khác") diemLop = 0;
 
-      // Tổng số giải để cộng thêm
       const tongGiai = kk + ba + nhi + nhat;
       let diemThuong = diemIELTS + diemLop + (tongGiai >= 2 ? 2 : 0);
       diemThuong = Math.min(10, diemThuong);
@@ -80,6 +81,7 @@
       const tong = diemHocBa + diemThanhTich + diemThuong + pv;
 
       const resultDiv = document.getElementById('result');
+      const status = tong >= 50 ? "ĐỖ" : "KHÔNG ĐỖ";
 
       if (tong >= 50) {
         resultDiv.innerHTML = `✅ <b>ĐỖ! Chúc mừng bạn đã đỗ xttn vào lớp A2K61</b> — Tổng điểm: <b>${tong.toFixed(1)}</b>`;
@@ -88,7 +90,22 @@
         resultDiv.innerHTML = `❌ <b>KHÔNG ĐỖ! Chúc bạn may mắn lần sau</b> — Tổng điểm: <b>${tong.toFixed(1)}</b>`;
         resultDiv.className = 'failed';
       }
+
+      // Gửi dữ liệu lên Google Sheets
+      fetch("https://script.google.com/macros/s/AKfycbymL4ebEkNmwhUt_dFRP2vzd6xBQ8ScfJbGGGWuLmLnjx8U0kBAWNubqBGHe2kyw3vD/exec", {
+        method: "POST",
+        body: JSON.stringify({
+          name: name,
+          class: loptruong,
+          score: tong.toFixed(1),
+          status: status
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
     }
+
     
     function hienHuongDan() {
       alert(`🎯 QUY TẮC TÍNH ĐIỂM:
@@ -122,6 +139,23 @@
       ✅ Từ 50 điểm trở lên: ĐỖ
       ❌ Dưới 50 điểm: KHÔNG ĐỖ`);
     }
+    const name = document.getElementById('hoten').value;
+    const loptruong = document.getElementById('loptruong').value;
+    const status = tong >= 50 ? "ĐỖ" : "KHÔNG ĐỖ";
+
+    // Gửi dữ liệu lên Google Sheets
+    fetch("LINK_API_CUA_BAN", {
+      method: "POST",
+      body: JSON.stringify({
+        name: name,
+        class: loptruong,
+        score: tong.toFixed(1),
+        status: status
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
 
   </script>
 </body>
