@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Xét tuyển tài năng</title>
+  <link rel="website icon" type="png" href="logo-a2.png">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="container">
+    <div>
+        <h2 class="tieude">Form xét tuyển tài năng vào lớp A2K61</h2>
+    </div>
+
+    <label>Điểm tb cả năm môn Toán <input type="number" id="toan" step="0.1" min="0" max="10"></label>
+    <label>Điểm tb cả năm môn Lý <input type="number" id="ly" step="0.1" min="0" max="10"></label>
+    <label>Điểm tb cả năm môn Anh <input type="number" id="anh" step="0.1" min="0" max="10"></label>
+
+    <label>Số giải Khuyến khích (kì thi hsg) <input type="number" id="kk" min="0"></label>
+    <label>Số giải Ba (kì thi hsg) <input type="number" id="ba" min="0"></label>
+    <label>Số giải Nhì (kì thi hsg) <input type="number" id="nhi" min="0"></label>
+    <label>Số giải Nhất (kì thi hsg) <input type="number" id="nhat" min="0"></label>
+
+    <label>IELTS (nếu có)<input type="number" id="ielts" step="0.5" min="0" max="9"></label>
+    <label>Học sinh lớp nào:
+      <select id="lop">
+        <option value="">-- Chọn lớp --</option>
+        <option value="A1K61">A1K61</option>
+        <option value="A5K61">A5K61</option>
+        <option value="D1K61">D1K61</option>
+        <option value="D2K61">D2K61</option>
+        <option value="Khác">Khác</option>
+      </select>
+    </label>
+    
+    
+    <label>Điểm phỏng vấn (0–20) <input type="number" id="pv" min="0" max="20"></label>
+
+    <button onclick="tinhDiem()">Tính điểm</button>
+    <button onclick="window.location.href='huongdan.html'">📘 Hướng dẫn tính điểm</button>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function tinhDiem() {
+      const toan = +document.getElementById('toan').value;
+      const ly = +document.getElementById('ly').value;
+      const anh = +document.getElementById('anh').value;
+      const kk = +document.getElementById('kk').value;
+      const ba = +document.getElementById('ba').value;
+      const nhi = +document.getElementById('nhi').value;
+      const nhat = +document.getElementById('nhat').value;
+      const ielts = +document.getElementById('ielts').value;
+      const pv = +document.getElementById('pv').value;
+      const lop = document.getElementById('lop').value;
+
+      const tb = (toan + ly + anh) / 3;
+      const diemHocBa = tb * 4;
+
+      const diemThanhTich = Math.min(30, kk * 5 + ba * 10 + nhi * 15 + nhat * 20);
+
+      // Tính điểm IELTS
+      let diemIELTS = 0;
+      if (ielts >= 5 && ielts <= 9) {
+        diemIELTS = Math.floor((ielts - 5) * 2) + 1;
+      }
+
+      // Tính điểm cộng từ lớp
+      let diemLop = 0;
+      if (lop === "A1K61" || lop === "D1K61") diemLop = 5;
+      else if (lop === "A5K61" || lop === "D2K61") diemLop = 4;
+      else if (lop === "Khác") diemLop = 0;
+
+      // Tổng số giải để cộng thêm
+      const tongGiai = kk + ba + nhi + nhat;
+      let diemThuong = diemIELTS + diemLop + (tongGiai >= 2 ? 2 : 0);
+      diemThuong = Math.min(10, diemThuong);
+
+      const tong = diemHocBa + diemThanhTich + diemThuong + pv;
+
+      const resultDiv = document.getElementById('result');
+
+      if (tong >= 50) {
+        resultDiv.innerHTML = `✅ <b>ĐỖ! Chúc mừng bạn đã đỗ xttn vào lớp A2K61</b> — Tổng điểm: <b>${tong.toFixed(1)}</b>`;
+        resultDiv.className = 'passed';
+      } else {
+        resultDiv.innerHTML = `❌ <b>KHÔNG ĐỖ! Chúc bạn may mắn lần sau</b> — Tổng điểm: <b>${tong.toFixed(1)}</b>`;
+        resultDiv.className = 'failed';
+      }
+    }
+    
+    function hienHuongDan() {
+      alert(`🎯 QUY TẮC TÍNH ĐIỂM:
+      1. 🔢 Điểm học bạ:
+        - Trung bình 3 môn Toán, Lý, Anh
+        - Công thức : Điểm học bạ = (((Toán + Lý + Anh) / 3) / 10) * 40
+        ➤ Tối đa: 40 điểm
+
+      2. 🏆 Thành tích học sinh giỏi:
+        - Khuyến khích: 5 điểm
+        - Giải Ba: 10 điểm
+        - Giải Nhì: 15 điểm
+        - Giải Nhất: 20 điểm
+        (Nhiều giải có thể cộng dồn nếu số điểm > 30đ thì lấy 30đ)
+        ➤ Tối đa: 30 điểm
+
+      ...
+      3. 🎖️ Điểm thưởng:
+        - IELTS 5.0 trở lên: 1–5 điểm
+        - Có từ 2 giải trở lên: +2 điểm
+        - Học sinh các lớp:
+          + A1K61, D1K61: +5 điểm
+          + A5K61, D2K61: +4 điểm
+          + Khác: Không được cộng điểm
+        ➤ Tối đa phần thưởng: 10 điểm
+      ...
+      4. 💬 Phỏng vấn:
+        ➤ Tối đa: 20 điểm
+
+      🎓 Tổng điểm tối đa: 100
+      ✅ Từ 50 điểm trở lên: ĐỖ
+      ❌ Dưới 50 điểm: KHÔNG ĐỖ`);
+    }
+
+  </script>
+</body>
+</html>
