@@ -5,6 +5,25 @@
   <title>Xét tuyển tài năng</title>
   <link rel="website icon" type="png" href="logo-a2.png">
   <link rel="stylesheet" href="index.css">
+  <!-- Firebase App (core SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js"></script>
+  <!-- Firebase Realtime Database -->
+  <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-database.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAH3G6n3ukcgxsHhayhb4B9QaXVB4hAAbE",
+      authDomain: "xttn-a2k61.firebaseapp.com",
+      projectId: "xttn-a2k61",
+      databaseURL: "https://xttn-a2k61-default-rtdb.firebaseio.com", // QUAN TRỌNG
+      storageBucket: "xttn-a2k61.appspot.com",
+      messagingSenderId: "806060055508",
+      appId: "1:806060055508:web:03a64e19b8070657285441",
+      measurementId: "G-KZ9E9YZE4S"
+    };
+  
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+  </script>
 </head>
 <body>
   <div class="container">
@@ -90,54 +109,23 @@
         resultDiv.innerHTML = `❌ <b>KHÔNG ĐỖ! Chúc bạn may mắn lần sau</b> — Tổng điểm: <b>${tong.toFixed(1)}</b>`;
         resultDiv.className = 'failed';
       }
+      // Gửi dữ liệu lên Firebase
+      const data = {
+        name: name,
+        loptruong: loptruong,
+        diem: tong,
+        status: status,
+        timestamp: new Date().toISOString()
+      };
 
-      // Gửi dữ liệu lên Google Sheets
-      fetch("https://script.google.com/macros/s/AKfycbz4jwImlxSfaljOxC7TFvOT7uu9MkfQm4kimdQhVXQhX4cJluNxPqXRksHzZgWXix-Qlg/exec", {
-        method: "POST",
-        body: JSON.stringify({
-          name: name,
-          class: loptruong,
-          score: tong.toFixed(1),
-          status: status
-        }),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-    }
+      firebase.database().ref("xettuyen").push(data)
+        .then(() => {
+          console.log("✅ Gửi dữ liệu thành công!");
+        })
+        .catch((error) => {
+          console.error("❌ Lỗi khi gửi dữ liệu: ", error);
+        });
 
-    
-    function hienHuongDan() {
-      alert(`🎯 QUY TẮC TÍNH ĐIỂM:
-      1. 🔢 Điểm học bạ:
-        - Trung bình 3 môn Toán, Lý, Anh
-        - Công thức : Điểm học bạ = (((Toán + Lý + Anh) / 3) / 10) * 40
-        ➤ Tối đa: 40 điểm
-
-      2. 🏆 Thành tích học sinh giỏi:
-        - Khuyến khích: 5 điểm
-        - Giải Ba: 10 điểm
-        - Giải Nhì: 15 điểm
-        - Giải Nhất: 20 điểm
-        (Nhiều giải có thể cộng dồn nếu số điểm > 30đ thì lấy 30đ)
-        ➤ Tối đa: 30 điểm
-
-      ...
-      3. 🎖️ Điểm thưởng:
-        - IELTS 5.0 trở lên: 1–5 điểm
-        - Có từ 2 giải trở lên: +2 điểm
-        - Học sinh các lớp:
-          + A1K61, D1K61: +5 điểm
-          + A5K61, D2K61: +4 điểm
-          + Khác: Không được cộng điểm
-        ➤ Tối đa phần thưởng: 10 điểm
-      ...
-      4. 💬 Phỏng vấn:
-        ➤ Tối đa: 20 điểm
-
-      🎓 Tổng điểm tối đa: 100
-      ✅ Từ 50 điểm trở lên: ĐỖ
-      ❌ Dưới 50 điểm: KHÔNG ĐỖ`);
     }
 
   </script>
